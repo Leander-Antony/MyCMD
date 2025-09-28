@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
+.terminal-container {
+  background-color: transparent;
+  color: #00ff00;
+  font-family: "Jersey 10", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+  font-size: 30px;
+  padding: 20px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  cursor: url('../cursor.cur'), auto;
+}
+
+.terminal-history {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 10px;
+}
+
+.terminal-line {
+  white-space: pre-wrap;
+  margin-bottom: 4px;
+}
+
+.terminal-input-form {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.terminal-prompt {
+  color: #00cc00;
+  margin-right: 5px;
+  font-size: 30px;
+}
+
+.terminal-input {
+  background-color: #000;
+  color: #00ff00;
+  border: none;
+  outline: none;
+  flex: 1;
+  font-family: "Jersey 10", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+  font-size: 30px;
+  cursor: url('../cursor.cur'), text;
+}
+
+.terminal-link {
+  color: #00ccff;
+  text-decoration: underline;
+  cursor: url('../cursor.cur'), pointer;
+}
+
+.terminal-link:hover {
+  color: #00ffff;
+  text-decoration: none;
+}
+
+.help-panel {
+  width: 400px;
+  max-height: 80vh;
+  background-color: rgba(0, 0, 0, 0.95);
+  border-radius: 16px;
+  padding: 15px;
+  font-family: "Jersey 10", sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  color: #00ff00;
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: auto;
+}
+
+.help-panel h3 {
+  color: #00cc00;
+  margin: 0 0 10px 0;
+  font-size: 22px;
+  text-align: center;
+  border-bottom: 1px solid #00cc00;
+  padding-bottom: 8px;
+}
+
+.help-panel .command {
+  margin-bottom: 8px;
+  padding: 4px 0;
+}
+
+.help-panel .command-name {
+  color: #00ccff;
+  font-weight: 800;
+}
+
+.help-panel .command-desc {
+  color: #00ff00;
+  margin-left: 10px;
+}
+
+.help-section {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #004400;
+}
+
+.section-title {
+  color: #00cc00;
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 5px;
+  text-decoration: underline;
+}
+
+.command-compact {
+  font-size: 18px;
+  margin-bottom: 3px;
+  line-height: 1.2;
+}
+
+/* System commands - Blue theme */
+.help-section:nth-child(1) .section-title {
+  color: #00ccff;
+}
+
+.help-section:nth-child(1) .command-compact {
+  color: #66ddff;
+}
+
+/* Categories commands - Green theme */
+.help-section:nth-child(2) .section-title {
+  color: #00ff66;
+}
+
+.help-section:nth-child(2) .command-compact {
+  color: #66ff99;
+}
+
+/* Items commands - Yellow theme */
+.help-section:nth-child(3) .section-title {
+  color: #ffcc00;
+}
+
+.help-section:nth-child(3) .command-compact {
+  color: #ffdd66;
+}
