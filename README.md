@@ -74,12 +74,12 @@ To switch between different background effects, you need to modify the `src/comp
 1. Open `src/components/Terminal.jsx`
 2. Find lines around 387-388:
    ```jsx
-   <BackgroundEffects />
+   <GlowDot />
    {/* <MatrixRain /> */}
    ```
-3. Comment out `BackgroundEffects` and uncomment `MatrixRain`:
+3. Comment out `GlowDot` and uncomment `MatrixRain`:
    ```jsx
-   {/* <BackgroundEffects /> */}
+   {/* <GlowDot /> */}
    <MatrixRain />
    ```
 
@@ -87,7 +87,7 @@ To switch between different background effects, you need to modify the `src/comp
 1. Open `src/components/Terminal.jsx`
 2. Find the same lines and reverse the changes:
    ```jsx
-   <BackgroundEffects />
+   <GlowDot />
    {/* <MatrixRain /> */}
    ```
 

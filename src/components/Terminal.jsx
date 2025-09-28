@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./Terminal.css";
 import ElectricBorder from './ElectricBorder';
 import MatrixRain from './MatrixRain';
-import BackgroundEffects from "./GlowDot";
+import GlowDot from "./GlowDot";
 
 export default function Terminal() {
   const [history, setHistory] = useState([]);
@@ -384,7 +384,7 @@ export default function Terminal() {
 
   return (
     <>
-      <BackgroundEffects />
+      <GlowDot />
       {/* <MatrixRain /> */}
       <div className="terminal-container" onClick={() => inputRef.current.focus()}>
         <div className="terminal-history">
