@@ -3,6 +3,7 @@
 A sleek, terminal-inspired React application with stunning visual effects including Matrix rain animation, electric borders, and cyberpunk aesthetics. Built with modern React and powered by Vite for lightning-fast development.
 
 ![MyCMD Screenshot](src/assets/screenshot.png)
+![MyCMD Screenshot](src/assets/screenshot2.png)
 
 ## 🚀 Features
 
