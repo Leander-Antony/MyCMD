@@ -2,8 +2,18 @@
 
 A sleek, terminal-inspired React application with stunning visual effects including Matrix rain animation, electric borders, and cyberpunk aesthetics. Built with modern React and powered by Vite for lightning-fast development.
 
-![MyCMD Screenshot](src/assets/screenshot.png)
-![MyCMD Screenshot](src/assets/screenshot2.png)
+### 📸 Screenshots
+
+<div align="center">
+  <div style="display: inline-block; width: 45%; margin: 0 2%;">
+    <h4 align="center">GlowDot Effects</h4>
+    <img src="src/assets/screenshot.png" alt="MyCMD with GlowDot Effects" width="100%" />
+  </div>
+  <div style="display: inline-block; width: 45%; margin: 0 2%;">
+    <h4 align="center">Matrix Effect</h4>
+    <img src="src/assets/screenshot2.png" alt="MyCMD with Matrix Effect" width="100%" />
+  </div>
+</div>
 
 ## 🚀 Features
 
@@ -68,7 +78,7 @@ Once the application is running, you can use various terminal commands:
 - **Terminal.jsx** - Main terminal interface with command processing
 - **MatrixRain.jsx** - Animated Matrix-style background effect
 - **ElectricBorder.jsx** - Glowing border animation component
-- **BackgroundEffects.jsx** - Additional visual effects and animations
+- **GlowDot.jsx** - Additional visual effects and animations
 
 ## 💾 Data Persistence
 

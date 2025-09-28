@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./Terminal.css";
 import ElectricBorder from './ElectricBorder';
 import MatrixRain from './MatrixRain';
-import BackgroundEffects from "./BackgroundEffects";
+import BackgroundEffects from "./GlowDot";
 
 export default function Terminal() {
   const [history, setHistory] = useState([]);

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import './BackgroundEffects.css';
+import './GlowDot.css';
 
-const BackgroundEffects = () => {
+const GlowDot = () => {
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
   const particlesRef = useRef([]);
@@ -22,7 +22,7 @@ const BackgroundEffects = () => {
       canvas.style.width = '100vw';
       canvas.style.height = '100vh';
       
-      console.log(`BackgroundEffects canvas resized to: ${canvas.width}x${canvas.height}`);
+      console.log(`GlowDot canvas resized to: ${canvas.width}x${canvas.height}`);
     };
 
     // Initialize particles
@@ -155,4 +155,4 @@ const BackgroundEffects = () => {
   );
 };
 
-export default BackgroundEffects;
+export default GlowDot;
