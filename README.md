@@ -66,6 +66,33 @@ Once the application is running, you can use various terminal commands:
 - `courses` - Manage your courses
 - And many more interactive commands!
 
+## 🎨 Changing Background Effects
+
+To switch between different background effects, you need to modify the `src/components/Terminal.jsx` file:
+
+### Switch to Matrix Effect:
+1. Open `src/components/Terminal.jsx`
+2. Find lines around 387-388:
+   ```jsx
+   <BackgroundEffects />
+   {/* <MatrixRain /> */}
+   ```
+3. Comment out `BackgroundEffects` and uncomment `MatrixRain`:
+   ```jsx
+   {/* <BackgroundEffects /> */}
+   <MatrixRain />
+   ```
+
+### Switch to Glow Dot Effects:
+1. Open `src/components/Terminal.jsx`
+2. Find the same lines and reverse the changes:
+   ```jsx
+   <BackgroundEffects />
+   {/* <MatrixRain /> */}
+   ```
+
+The changes will be reflected immediately in your development server thanks to Vite's hot module replacement.
+
 ## 📝 Scripts
 
 - `npm run dev` - Start development server
