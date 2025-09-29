@@ -147,6 +147,24 @@
   color: #dd99ff;
 }
 
+/* Analytics commands - Orange theme */
+.help-section:nth-child(5) .section-title {
+  color: #ff8800;
+}
+
+.help-section:nth-child(5) .command-compact {
+  color: #ffaa44;
+}
+
+/* Utilities commands - Cyan theme */
+.help-section:nth-child(6) .section-title {
+  color: #00ffcc;
+}
+
+.help-section:nth-child(6) .command-compact {
+  color: #44ffdd;
+}
+
 /* Autocomplete styles */
 .input-container {
   position: relative;

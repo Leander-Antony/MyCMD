@@ -14,13 +14,26 @@ export default function Terminal() {
   const [commandHistory, setCommandHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [autoComplete, setAutoComplete] = useState("");
+  const [sessionStart] = useState(() => {
+    const saved = localStorage.getItem("terminalSessionStart");
+    return saved ? new Date(saved) : new Date();
+  });
+  const [commandCount, setCommandCount] = useState(() => {
+    const saved = localStorage.getItem("terminalCommandCount");
+    return saved ? parseInt(saved, 10) : 0;
+  });
+  const [commandFrequency, setCommandFrequency] = useState(() => {
+    const saved = localStorage.getItem("terminalCommandFrequency");
+    return saved ? JSON.parse(saved) : {};
+  });
   const inputRef = useRef(null);
 
   // Available commands for autocomplete
   const availableCommands = [
     "help", "clear", "debug", "logout", "categories", "cats",
     "addcat", "removecat", "add", "remove",
-    "github", "yt", "mail", "zorotek"
+    "github", "yt", "mail", "zorotek",
+    "stats", "uptime", "memory", "usage", "grep", "quote"
   ];
 
   // Function to find autocomplete suggestion
@@ -66,6 +79,11 @@ export default function Terminal() {
     setIsAuthenticated(authStatus);
     setShowHelp(authStatus);
 
+    // Save session start time to localStorage if not already saved
+    if (authStatus && !localStorage.getItem("terminalSessionStart")) {
+      localStorage.setItem("terminalSessionStart", new Date().toISOString());
+    }
+
     // Load command history
     const savedCommandHistory = localStorage.getItem("terminalCommandHistory");
     if (savedCommandHistory) {
@@ -93,6 +111,20 @@ export default function Terminal() {
       localStorage.setItem("terminalCommandHistory", JSON.stringify(commandHistory));
     }
   }, [commandHistory]);
+
+  // Save command count to localStorage whenever it changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      localStorage.setItem("terminalCommandCount", commandCount.toString());
+    }
+  }, [commandCount, isAuthenticated]);
+
+  // Save command frequency to localStorage whenever it changes
+  useEffect(() => {
+    if (isAuthenticated && Object.keys(commandFrequency).length > 0) {
+      localStorage.setItem("terminalCommandFrequency", JSON.stringify(commandFrequency));
+    }
+  }, [commandFrequency, isAuthenticated]);
 
   // Helper function to normalize links
   const normalizeURL = (str) => {
@@ -156,12 +188,27 @@ export default function Terminal() {
   const handleCommand = (cmd) => {
     let command = cmd.trim();
 
+    // Track command usage (but not for authentication command)
+    if (isAuthenticated && command !== "zoro") {
+      setCommandCount(prev => prev + 1);
+      setCommandFrequency(prev => ({
+        ...prev,
+        [command]: (prev[command] || 0) + 1
+      }));
+    }
+
     // Check authentication first
     if (!isAuthenticated) {
       if (command === "zoro") {
         setIsAuthenticated(true);
         setShowHelp(true);
         localStorage.setItem("terminalAuth", "true");
+        
+        // Set session start time if not already set
+        if (!localStorage.getItem("terminalSessionStart")) {
+          localStorage.setItem("terminalSessionStart", new Date().toISOString());
+        }
+        
         setHistory(prev => [...prev, `Access granted. Welcome, master.`, `Type 'help' to see available commands.`]);
         return;
       } else {
@@ -202,7 +249,17 @@ export default function Terminal() {
     if (command === "logout") {
       setIsAuthenticated(false);
       setShowHelp(false);
+      
+      // Clear all session data from localStorage
       localStorage.removeItem("terminalAuth");
+      localStorage.removeItem("terminalSessionStart");
+      localStorage.removeItem("terminalCommandCount");
+      localStorage.removeItem("terminalCommandFrequency");
+      
+      // Reset session statistics
+      setCommandCount(0);
+      setCommandFrequency({});
+      
       setHistory([
         `Welcome to MyCMD!`,
         `Session terminated. Enter the secret word to access the terminal...`
@@ -232,6 +289,133 @@ export default function Terminal() {
     if (command === "zorotek") {
       setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Opening ZoroTek social links...`]);
       window.open("https://zorotekdev.vercel.app/", "_blank");
+      return;
+    }
+
+    // Statistics Commands
+    if (command === "stats") {
+      const uptime = Math.floor((new Date() - sessionStart) / 1000);
+      const hours = Math.floor(uptime / 3600);
+      const minutes = Math.floor((uptime % 3600) / 60);
+      const seconds = uptime % 60;
+      
+      const mostUsed = Object.entries(commandFrequency)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5)
+        .map(([cmd, count]) => `${cmd}: ${count} times`);
+
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
+        `=== SESSION STATISTICS ===`,
+        `Uptime: ${hours}h ${minutes}m ${seconds}s`,
+        `Commands executed: ${commandCount}`,
+        `Most used commands:`,
+        ...mostUsed.length > 0 ? mostUsed : ['  No commands executed yet']
+      ]);
+      return;
+    }
+
+    if (command === "uptime") {
+      const uptime = Math.floor((new Date() - sessionStart) / 1000);
+      const hours = Math.floor(uptime / 3600);
+      const minutes = Math.floor((uptime % 3600) / 60);
+      const seconds = uptime % 60;
+      
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
+        `Session uptime: ${hours}h ${minutes}m ${seconds}s`,
+        `Started: ${sessionStart.toLocaleTimeString()}`
+      ]);
+      return;
+    }
+
+    if (command === "memory") {
+      const dataSize = JSON.stringify(data).length;
+      const historySize = JSON.stringify(commandHistory).length;
+      const totalSize = dataSize + historySize;
+      
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
+        `=== MEMORY USAGE ===`,
+        `Data storage: ${(dataSize / 1024).toFixed(2)} KB`,
+        `Command history: ${(historySize / 1024).toFixed(2)} KB`,
+        `Total usage: ${(totalSize / 1024).toFixed(2)} KB`,
+        `Categories: ${Object.keys(data).length}`,
+        `Total items: ${Object.values(data).reduce((sum, arr) => sum + (arr?.length || 0), 0)}`
+      ]);
+      return;
+    }
+
+    if (command === "usage") {
+      const totalCommands = Object.values(commandFrequency).reduce((sum, count) => sum + count, 0);
+      const uniqueCommands = Object.keys(commandFrequency).length;
+      const avgPerCommand = totalCommands > 0 ? (totalCommands / uniqueCommands).toFixed(1) : 0;
+      
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
+        `=== USAGE ANALYTICS ===`,
+        `Total commands: ${totalCommands}`,
+        `Unique commands: ${uniqueCommands}`,
+        `Average per command: ${avgPerCommand}`,
+        `Command frequency:`,
+        ...Object.entries(commandFrequency)
+          .sort(([,a], [,b]) => b - a)
+          .map(([cmd, count]) => `  ${cmd}: ${count}x (${((count/totalCommands)*100).toFixed(1)}%)`)
+      ]);
+      return;
+    }
+
+    // Grep search command
+    if (command.startsWith("grep")) {
+      const searchTerm = command.substring(4).trim();
+      if (!searchTerm) {
+        setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
+          `Usage: grep <search_term>`,
+          `Search through all stored data`
+        ]);
+        return;
+      }
+
+      const results = [];
+      Object.entries(data).forEach(([category, items]) => {
+        if (Array.isArray(items)) {
+          items.forEach((item, index) => {
+            if (item.toLowerCase().includes(searchTerm.toLowerCase())) {
+              results.push(`${category}[${index + 1}]: ${item}`);
+            }
+          });
+        }
+      });
+
+      if (results.length === 0) {
+        setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
+          `No results found for "${searchTerm}"`
+        ]);
+      } else {
+        setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
+          `Found ${results.length} result(s) for "${searchTerm}":`,
+          ...results
+        ]);
+      }
+      return;
+    }
+
+    // Quote API command
+    if (command === "quote") {
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Fetching inspirational quote...`]);
+      
+      // Using quotable.io API for quotes
+      fetch('https://api.quotable.io/random')
+        .then(response => response.json())
+        .then(quote => {
+          setHistory(prev => [...prev,
+            `"${quote.content}"`,
+            `— ${quote.author}`
+          ]);
+        })
+        .catch(error => {
+          setHistory(prev => [...prev,
+            `Failed to fetch quote. Here's a local one:`,
+            `"The only way to do great work is to love what you do."`,
+            `— Steve Jobs`
+          ]);
+        });
       return;
     }
 
@@ -517,6 +701,16 @@ export default function Terminal() {
             <div className="help-section">
               <div className="section-title">QUICK LINKS</div>
               <div className="command-compact">github, yt, mail, zorotek</div>
+            </div>
+            
+            <div className="help-section">
+              <div className="section-title">ANALYTICS</div>
+              <div className="command-compact">stats, uptime, memory, usage</div>
+            </div>
+            
+            <div className="help-section">
+              <div className="section-title">UTILITIES</div>
+              <div className="command-compact">grep &lt;term&gt;, quote</div>
             </div>
             
             <h3>MyCMD Commands</h3>
