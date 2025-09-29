@@ -507,7 +507,8 @@ export default function Terminal() {
             
             <div className="help-section">
               <div className="section-title">DATA MANAGEMENT</div>
-              <div className="command-compact">categories, addcat "name"</div>
+              <div className="command-compact">categories (or) cats</div>
+              <div className="command-compact">addcat "name"</div>
               <div className="command-compact">removecat "name"</div>
               <div className="command-compact">add "item" in [category]</div>
               <div className="command-compact">remove [id] from [category]</div>
