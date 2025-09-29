@@ -398,23 +398,57 @@ export default function Terminal() {
 
     // Quote API command
     if (command === "quote") {
-      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Fetching inspirational quote...`]);
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Fetching quote from web...`]);
       
-      // Using quotable.io API for quotes
-      fetch('https://api.quotable.io/random')
+      // Local fallback quotes array
+      const localQuotes = [
+        { content: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+        { content: "Innovation distinguishes between a leader and a follower.", author: "Steve Jobs" },
+        { content: "Code is like humor. When you have to explain it, it's bad.", author: "Cory House" },
+        { content: "First, solve the problem. Then, write the code.", author: "John Johnson" },
+        { content: "Experience is the name everyone gives to their mistakes.", author: "Oscar Wilde" },
+        { content: "In order to be irreplaceable, one must always be different.", author: "Coco Chanel" },
+        { content: "Java is to JavaScript what car is to Carpet.", author: "Chris Heilmann" },
+        { content: "Knowledge is power.", author: "Francis Bacon" },
+        { content: "Sometimes it pays to stay in bed on Monday, rather than spending the rest of the week debugging Monday's code.", author: "Dan Salomon" },
+        { content: "Perfection is achieved not when there is nothing more to add, but when there is nothing left to take away.", author: "Antoine de Saint-Exupéry" },
+        { content: "Ruby is rubbish! PHP is phpantastic!", author: "Nikita Popov" },
+        { content: "Code never lies, comments sometimes do.", author: "Ron Jeffries" },
+        { content: "Simplicity is the ultimate sophistication.", author: "Leonardo da Vinci" },
+        { content: "Programming isn't about what you know; it's about what you can figure out.", author: "Chris Pine" },
+        { content: "The best error message is the one that never shows up.", author: "Thomas Fuchs" }
+      ];
+      
+      // Using a simple, reliable API that works in all environments
+      fetch('https://api.adviceslip.com/advice')
         .then(response => response.json())
-        .then(quote => {
+        .then(data => {
           setHistory(prev => [...prev,
-            `"${quote.content}"`,
-            `— ${quote.author}`
+            `"${data.slip.advice}"`,
+            `— Daily Wisdom`,
           ]);
         })
         .catch(error => {
-          setHistory(prev => [...prev,
-            `Failed to fetch quote. Here's a local one:`,
-            `"The only way to do great work is to love what you do."`,
-            `— Steve Jobs`
-          ]);
+          console.log('API Error:', error);
+          // Try alternative simple API
+          fetch('https://api.quotable.io/random')
+            .then(response => response.json())
+            .then(quote => {
+              setHistory(prev => [...prev,
+                `"${quote.content}"`,
+                `— ${quote.author}`,
+              ]);
+            })
+            .catch(secondError => {
+              console.log('Both APIs failed:', secondError);
+              // Display random local quote instead of error
+              const randomQuote = localQuotes[Math.floor(Math.random() * localQuotes.length)];
+              setHistory(prev => [...prev,
+                `"${randomQuote.content}"`,
+                `— ${randomQuote.author}`,
+                `(offline quote)`
+              ]);
+            });
         });
       return;
     }
