@@ -41,19 +41,6 @@
   font-size: 30px;
 }
 
-.terminal-input {
-  background-color: #000;
-  color: #00ff00;
-  border: none;
-  outline: none;
-  flex: 1;
-  font-family: "Jersey 10", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 30px;
-  cursor: url('../cursor.cur'), text;
-}
-
 .terminal-link {
   color: #00ccff;
   text-decoration: underline;
@@ -66,14 +53,14 @@
 }
 
 .help-panel {
-  width: 400px;
-  max-height: 80vh;
+  width: 350px;
+  max-height: 70vh;
   background-color: rgba(0, 0, 0, 0.95);
   border-radius: 16px;
-  padding: 15px;
+  padding: 12px;
   font-family: "Jersey 10", sans-serif;
   font-weight: 400;
-  font-size: 18px;
+  font-size: 16px;
   color: #00ff00;
   display: flex;
   flex-direction: column-reverse;
@@ -105,23 +92,23 @@
 }
 
 .help-section {
-  margin-bottom: 15px;
-  padding-bottom: 10px;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
   border-bottom: 1px solid #004400;
 }
 
 .section-title {
   color: #00cc00;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 400;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
   text-decoration: underline;
 }
 
 .command-compact {
-  font-size: 18px;
-  margin-bottom: 3px;
-  line-height: 1.2;
+  font-size: 14px;
+  margin-bottom: 2px;
+  line-height: 1.1;
 }
 
 /* System commands - Blue theme */
@@ -149,4 +136,50 @@
 
 .help-section:nth-child(3) .command-compact {
   color: #ffdd66;
+}
+
+/* Quick Links commands - Purple theme */
+.help-section:nth-child(4) .section-title {
+  color: #cc66ff;
+}
+
+.help-section:nth-child(4) .command-compact {
+  color: #dd99ff;
+}
+
+/* Autocomplete styles */
+.input-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.terminal-input {
+  background-color: transparent;
+  color: #00ff00;
+  border: none;
+  outline: none;
+  width: 100%;
+  font-family: "Jersey 10", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 30px;
+  cursor: url('../cursor.cur'), text;
+  z-index: 2;
+  position: relative;
+}
+
+.autocomplete-preview {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #004400;
+  font-family: "Jersey 10", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 30px;
+  pointer-events: none;
+  z-index: 1;
+  white-space: pre;
 }

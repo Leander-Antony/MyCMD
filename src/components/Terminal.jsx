@@ -13,7 +13,36 @@ export default function Terminal() {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [commandHistory, setCommandHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+  const [autoComplete, setAutoComplete] = useState("");
   const inputRef = useRef(null);
+
+  // Available commands for autocomplete
+  const availableCommands = [
+    "help", "clear", "debug", "logout", "categories", "cats",
+    "addcat", "removecat", "add", "remove",
+    "github", "yt", "mail", "zorotek"
+  ];
+
+  // Function to find autocomplete suggestion
+  const getAutoCompleteSuggestion = (currentInput) => {
+    if (!currentInput || !isAuthenticated) return "";
+    
+    const trimmedInput = currentInput.trim().toLowerCase();
+    if (trimmedInput === "") return "";
+    
+    // Find matching command
+    const match = availableCommands.find(cmd => 
+      cmd.toLowerCase().startsWith(trimmedInput) && cmd.toLowerCase() !== trimmedInput
+    );
+    
+    return match ? match.substring(trimmedInput.length) : "";
+  };
+
+  // Update autocomplete when input changes
+  useEffect(() => {
+    const suggestion = getAutoCompleteSuggestion(input);
+    setAutoComplete(suggestion);
+  }, [input, isAuthenticated]);
 
   // Load stored data from localStorage on mount
   useEffect(() => {
@@ -178,6 +207,31 @@ export default function Terminal() {
         `Welcome to MyCMD!`,
         `Session terminated. Enter the secret word to access the terminal...`
       ]);
+      return;
+    }
+
+    // Quick link commands
+    if (command === "github") {
+      window.open("https://github.com", "_blank");
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Opening GitHub in new tab...`]);
+      return;
+    }
+
+    if (command === "yt") {
+      window.open("https://youtube.com", "_blank");
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Opening YouTube in new tab...`]);
+      return;
+    }
+
+    if (command === "mail") {
+      window.open("https://gmail.com", "_blank");
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Opening Gmail in new tab...`]);
+      return;
+    }
+
+    if (command === "zorotek") {
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Opening ZoroTek social links...`]);
+      window.open("https://zorotekdev.vercel.app/", "_blank");
       return;
     }
 
@@ -350,6 +404,20 @@ export default function Terminal() {
         setHistoryIndex(-1);
         setInput("");
       }
+    } else if (e.key === 'ArrowRight') {
+      // Accept autocomplete suggestion
+      if (autoComplete && e.target.selectionStart === input.length) {
+        e.preventDefault();
+        setInput(input + autoComplete);
+        setAutoComplete("");
+      }
+    } else if (e.key === 'Tab') {
+      // Accept autocomplete suggestion with Tab key as well
+      if (autoComplete) {
+        e.preventDefault();
+        setInput(input + autoComplete);
+        setAutoComplete("");
+      }
     }
   };
 
@@ -398,15 +466,22 @@ export default function Terminal() {
           <span className="terminal-prompt">
             {isAuthenticated ? "root@mycmd:~$ " : "secret> "}
           </span>
-          <input
-            ref={inputRef}
-            type={isAuthenticated ? "text" : "password"}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="terminal-input"
-            autoFocus
-          />
+          <div className="input-container">
+            <input
+              ref={inputRef}
+              type={isAuthenticated ? "text" : "password"}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="terminal-input"
+              autoFocus
+            />
+            {isAuthenticated && autoComplete && (
+              <span className="autocomplete-preview">
+                {input}{autoComplete}
+              </span>
+            )}
+          </div>
         </form>
       </div>
       
@@ -431,18 +506,14 @@ export default function Terminal() {
             </div>
             
             <div className="help-section">
-              <div className="section-title">CATEGORIES</div>
-              <div className="command-compact">categories - list all</div>
-              <div className="command-compact">addcat "name" - create</div>
-              <div className="command-compact">removecat "name" - delete</div>
-              <div className="command-compact">[category] - show items</div>
+              <div className="section-title">DATA MANAGEMENT</div>
+              <div className="command-compact">categories, addcat "name", removecat "name"</div>
+              <div className="command-compact">add "item" in [category], remove [id] from [category]</div>
             </div>
             
             <div className="help-section">
-              <div className="section-title">ITEMS</div>
-              <div className="command-compact">add "item" in [category]</div>
-              <div className="command-compact">remove [id] from [category]</div>
-              <div className="command-compact">remove "name" from [category]</div>
+              <div className="section-title">QUICK LINKS</div>
+              <div className="command-compact">github, yt, mail, zorotek</div>
             </div>
             
             <h3>MyCMD Commands</h3>
