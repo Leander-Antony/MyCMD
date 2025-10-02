@@ -27,6 +27,7 @@ export default function Terminal() {
     return saved ? JSON.parse(saved) : {};
   });
   const inputRef = useRef(null);
+  const historyRef = useRef(null);
 
   // Available commands for autocomplete
   const availableCommands = [
@@ -125,6 +126,13 @@ export default function Terminal() {
       localStorage.setItem("terminalCommandFrequency", JSON.stringify(commandFrequency));
     }
   }, [commandFrequency, isAuthenticated]);
+
+  // Auto-scroll to bottom when history changes
+  useEffect(() => {
+    if (historyRef.current) {
+      historyRef.current.scrollTop = historyRef.current.scrollHeight;
+    }
+  }, [history]);
 
   // Helper function to normalize links
   const normalizeURL = (str) => {
@@ -673,7 +681,7 @@ export default function Terminal() {
       <GlowDot />
       {/* <MatrixRain /> */}
       <div className="terminal-container" onClick={() => inputRef.current.focus()}>
-        <div className="terminal-history">
+        <div className="terminal-history" ref={historyRef}>
           {history.map((line, i) =>
             React.isValidElement(line)
               ? React.cloneElement(line, { key: i })

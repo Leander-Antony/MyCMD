@@ -9,19 +9,44 @@
   font-size: 30px;
   padding: 20px;
   height: 90vh;
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   cursor: url('../cursor.cur'), auto;
+  overflow: hidden;
 }
 
 .terminal-history {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-start;
   padding-bottom: 10px;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #00ff00 transparent;
+}
+
+/* Custom scrollbar styling for webkit browsers */
+.terminal-history::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-history::-webkit-scrollbar-track {
+  background: rgba(0, 255, 0, 0.1);
+  border-radius: 4px;
+}
+
+.terminal-history::-webkit-scrollbar-thumb {
+  background: #00ff00;
+  border-radius: 4px;
+  opacity: 0.7;
+}
+
+.terminal-history::-webkit-scrollbar-thumb:hover {
+  background: #00cc00;
 }
 
 .terminal-line {
@@ -33,6 +58,9 @@
   display: flex;
   align-items: center;
   margin-top: 8px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
 }
 
 .terminal-prompt {
