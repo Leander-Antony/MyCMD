@@ -682,11 +682,25 @@ export default function Terminal() {
       {/* <MatrixRain /> */}
       <div className="terminal-container" onClick={() => inputRef.current.focus()}>
         <div className="terminal-history" ref={historyRef}>
-          {history.map((line, i) =>
-            React.isValidElement(line)
-              ? React.cloneElement(line, { key: i })
-              : <div key={i} className="terminal-line">{line}</div>
-          )}
+          {history.map((line, i) => {
+            if (React.isValidElement(line)) {
+              return React.cloneElement(line, { key: i });
+            }
+            
+            // Check if line contains command prompt
+            if (typeof line === 'string' && line.startsWith('root@mycmd:~$ ')) {
+              const promptText = 'root@mycmd:~$ ';
+              const commandText = line.substring(promptText.length);
+              return (
+                <div key={i} className="command-line">
+                  <span className="prompt">{promptText}</span>
+                  <span className="command">{commandText}</span>
+                </div>
+              );
+            }
+            
+            return <div key={i} className="terminal-line">{line}</div>;
+          })}
         </div>
         <form onSubmit={handleSubmit} className="terminal-input-form">
           <span className="terminal-prompt">

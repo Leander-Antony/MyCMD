@@ -52,6 +52,21 @@
 .terminal-line {
   white-space: pre-wrap;
   margin-bottom: 4px;
+  color: #00ff00; /* Default terminal text color */
+}
+
+/* Specific styling for command lines with prompts */
+.command-line {
+  white-space: pre-wrap;
+  margin-bottom: 4px;
+}
+
+.command-line .prompt {
+  color: #00ccff; /* Coral red for the prompt */
+}
+
+.command-line .command {
+  color: #00ccff; /* Cyan for the command */
 }
 
 .terminal-input-form {
