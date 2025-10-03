@@ -1,5 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
 
+/* Global custom cursor */
+* {
+  cursor: url('../assets/cursor.cur'), auto !important;
+}
+
+body, html {
+  cursor: url('../assets/cursor.cur'), auto !important;
+}
+
+/* Ensure cursor applies to all interactive elements */
+input, button, a, .terminal-link {
+  cursor: url('../assets/cursor.cur'), pointer !important;
+}
+
 .terminal-container {
   background-color: transparent;
   color: #00ff00;
