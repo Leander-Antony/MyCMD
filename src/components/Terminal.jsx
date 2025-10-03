@@ -291,15 +291,14 @@ export default function Terminal() {
       localStorage.removeItem("terminalSessionStart");
       localStorage.removeItem("terminalCommandCount");
       localStorage.removeItem("terminalCommandFrequency");
+      localStorage.removeItem("terminalCommandHistory");
       
       // Reset session statistics
       setCommandCount(0);
       setCommandFrequency({});
+      setCommandHistory([]);
       
       // Reset session start time (fixes uptime not resetting on logout)
-      setSessionStart(new Date());
-      
-      // Reset session start time
       setSessionStart(new Date());
       
       setHistory([
