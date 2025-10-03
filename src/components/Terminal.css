@@ -96,116 +96,54 @@
 }
 
 .help-panel {
-  width: 350px;
-  max-height: 70vh;
+  width: 420px;
+  max-height: 60vh;
   background-color: rgba(0, 0, 0, 0.95);
   border-radius: 16px;
-  padding: 12px;
+  padding: 16px;
   font-family: "Jersey 10", sans-serif;
   font-weight: 400;
   font-size: 16px;
   color: #00ff00;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   overflow-y: auto;
 }
 
 .help-panel h3 {
   color: #00cc00;
-  margin: 0 0 10px 0;
-  font-size: 22px;
+  margin: 0 0 15px 0;
+  font-size: 20px;
   text-align: center;
   border-bottom: 1px solid #00cc00;
   padding-bottom: 8px;
 }
 
-.help-panel .command {
-  margin-bottom: 8px;
+.help-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.help-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 4px 0;
+  border-bottom: 1px solid rgba(0, 68, 0, 0.3);
 }
 
-.help-panel .command-name {
+.cmd-category {
   color: #00ccff;
   font-weight: 400;
-}
-
-.help-panel .command-desc {
-  color: #00ff00;
-  margin-left: 10px;
-}
-
-.help-section {
-  margin-bottom: 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #004400;
-}
-
-.section-title {
-  color: #00cc00;
-  font-size: 16px;
-  font-weight: 400;
-  margin-bottom: 3px;
-  text-decoration: underline;
-}
-
-.command-compact {
+  min-width: 60px;
   font-size: 14px;
-  margin-bottom: 2px;
-  line-height: 1.1;
 }
 
-/* System commands - Blue theme */
-.help-section:nth-child(1) .section-title {
-  color: #00ccff;
-}
-
-.help-section:nth-child(1) .command-compact {
-  color: #66ddff;
-}
-
-/* Categories commands - Green theme */
-.help-section:nth-child(2) .section-title {
-  color: #00ff66;
-}
-
-.help-section:nth-child(2) .command-compact {
-  color: #66ff99;
-}
-
-/* Items commands - Yellow theme */
-.help-section:nth-child(3) .section-title {
-  color: #ffcc00;
-}
-
-.help-section:nth-child(3) .command-compact {
-  color: #ffdd66;
-}
-
-/* Quick Links commands - Purple theme */
-.help-section:nth-child(4) .section-title {
-  color: #cc66ff;
-}
-
-.help-section:nth-child(4) .command-compact {
-  color: #dd99ff;
-}
-
-/* Analytics commands - Orange theme */
-.help-section:nth-child(5) .section-title {
-  color: #ff8800;
-}
-
-.help-section:nth-child(5) .command-compact {
-  color: #ffaa44;
-}
-
-/* Utilities commands - Cyan theme */
-.help-section:nth-child(6) .section-title {
-  color: #00ffcc;
-}
-
-.help-section:nth-child(6) .command-compact {
-  color: #44ffdd;
+.help-row span:last-child {
+  color: #00ff00;
+  font-size: 14px;
+  line-height: 1.2;
 }
 
 /* Autocomplete styles */

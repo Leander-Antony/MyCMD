@@ -14,7 +14,7 @@ export default function Terminal() {
   const [commandHistory, setCommandHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [autoComplete, setAutoComplete] = useState("");
-  const [sessionStart] = useState(() => {
+  const [sessionStart, setSessionStart] = useState(() => {
     const saved = localStorage.getItem("terminalSessionStart");
     return saved ? new Date(saved) : new Date();
   });
@@ -26,6 +26,10 @@ export default function Terminal() {
     const saved = localStorage.getItem("terminalCommandFrequency");
     return saved ? JSON.parse(saved) : {};
   });
+  const [aliases, setAliases] = useState(() => {
+    const saved = localStorage.getItem("terminalAliases");
+    return saved ? JSON.parse(saved) : {};
+  });
   const inputRef = useRef(null);
   const historyRef = useRef(null);
 
@@ -33,8 +37,8 @@ export default function Terminal() {
   const availableCommands = [
     "help", "clear", "debug", "logout", "categories", "cats",
     "addcat", "removecat", "add", "remove",
-    "github", "yt", "mail", "zorotek",
-    "stats", "uptime", "memory", "usage", "grep", "quote"
+    "stats", "uptime", "grep", "quote",
+    "alias", "aliaslist", "removealias"
   ];
 
   // Function to find autocomplete suggestion
@@ -82,7 +86,13 @@ export default function Terminal() {
 
     // Save session start time to localStorage if not already saved
     if (authStatus && !localStorage.getItem("terminalSessionStart")) {
-      localStorage.setItem("terminalSessionStart", new Date().toISOString());
+      const newSessionStart = new Date();
+      setSessionStart(newSessionStart);
+      localStorage.setItem("terminalSessionStart", newSessionStart.toISOString());
+    } else if (authStatus && localStorage.getItem("terminalSessionStart")) {
+      // Update sessionStart state from localStorage if already authenticated
+      const saved = localStorage.getItem("terminalSessionStart");
+      setSessionStart(new Date(saved));
     }
 
     // Load command history
@@ -126,6 +136,13 @@ export default function Terminal() {
       localStorage.setItem("terminalCommandFrequency", JSON.stringify(commandFrequency));
     }
   }, [commandFrequency, isAuthenticated]);
+
+  // Save aliases to localStorage whenever they change
+  useEffect(() => {
+    if (isAuthenticated && Object.keys(aliases).length >= 0) {
+      localStorage.setItem("terminalAliases", JSON.stringify(aliases));
+    }
+  }, [aliases, isAuthenticated]);
 
   // Auto-scroll to bottom when history changes
   useEffect(() => {
@@ -212,10 +229,10 @@ export default function Terminal() {
         setShowHelp(true);
         localStorage.setItem("terminalAuth", "true");
         
-        // Set session start time if not already set
-        if (!localStorage.getItem("terminalSessionStart")) {
-          localStorage.setItem("terminalSessionStart", new Date().toISOString());
-        }
+        // Set session start time for new session
+        const newSessionStart = new Date();
+        setSessionStart(newSessionStart);
+        localStorage.setItem("terminalSessionStart", newSessionStart.toISOString());
         
         setHistory(prev => [...prev, `Access granted. Welcome, master.`, `Type 'help' to see available commands.`]);
         return;
@@ -237,20 +254,31 @@ export default function Terminal() {
     }
 
     if (command === "debug") {
-      const rawData = localStorage.getItem("terminalData");
-      const storedData = rawData ? JSON.parse(rawData) : null;
-      const authStatus = localStorage.getItem("terminalAuth");
+      const allStorageKeys = Object.keys(localStorage);
+      const terminalKeys = allStorageKeys.filter(key => key.startsWith('terminal'));
+      const debugInfo = [`=== DEBUG INFO ===`];
       
-      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, 
-        `=== DEBUG INFO ===`,
-        `Raw localStorage: ${rawData}`,
-        `Parsed localStorage: ${JSON.stringify(storedData, null, 2)}`,
-        `Auth status: ${authStatus}`,
-        `Current React state: ${JSON.stringify(data, null, 2)}`,
-        `Links count: ${data.links?.length || 0}`,
-        `Projects count: ${data.projects?.length || 0}`,
-        `Courses count: ${data.courses?.length || 0}`
-      ]);
+      // Show all terminal-related localStorage
+      terminalKeys.forEach(key => {
+        const value = localStorage.getItem(key);
+        debugInfo.push(`${key}: ${value}`);
+      });
+      
+      // Show aliases
+      const aliases = JSON.parse(localStorage.getItem('terminalAliases') || '{}');
+      debugInfo.push(`Aliases: ${JSON.stringify(aliases, null, 2)}`);
+      
+      // Show current data state
+      debugInfo.push(`Current data state: ${JSON.stringify(data, null, 2)}`);
+      
+      // Show localStorage usage
+      let totalSize = 0;
+      allStorageKeys.forEach(key => {
+        totalSize += localStorage.getItem(key).length;
+      });
+      debugInfo.push(`Total localStorage size: ${(totalSize / 1024).toFixed(2)} KB`);
+      
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, ...debugInfo]);
       return;
     }
 
@@ -268,6 +296,12 @@ export default function Terminal() {
       setCommandCount(0);
       setCommandFrequency({});
       
+      // Reset session start time (fixes uptime not resetting on logout)
+      setSessionStart(new Date());
+      
+      // Reset session start time
+      setSessionStart(new Date());
+      
       setHistory([
         `Welcome to MyCMD!`,
         `Session terminated. Enter the secret word to access the terminal...`
@@ -275,30 +309,7 @@ export default function Terminal() {
       return;
     }
 
-    // Quick link commands
-    if (command === "github") {
-      window.open("https://github.com", "_blank");
-      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Opening GitHub in new tab...`]);
-      return;
-    }
 
-    if (command === "yt") {
-      window.open("https://youtube.com", "_blank");
-      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Opening YouTube in new tab...`]);
-      return;
-    }
-
-    if (command === "mail") {
-      window.open("https://gmail.com", "_blank");
-      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Opening Gmail in new tab...`]);
-      return;
-    }
-
-    if (command === "zorotek") {
-      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Opening ZoroTek social links...`]);
-      window.open("https://zorotekdev.vercel.app/", "_blank");
-      return;
-    }
 
     // Statistics Commands
     if (command === "stats") {
@@ -335,39 +346,9 @@ export default function Terminal() {
       return;
     }
 
-    if (command === "memory") {
-      const dataSize = JSON.stringify(data).length;
-      const historySize = JSON.stringify(commandHistory).length;
-      const totalSize = dataSize + historySize;
-      
-      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
-        `=== MEMORY USAGE ===`,
-        `Data storage: ${(dataSize / 1024).toFixed(2)} KB`,
-        `Command history: ${(historySize / 1024).toFixed(2)} KB`,
-        `Total usage: ${(totalSize / 1024).toFixed(2)} KB`,
-        `Categories: ${Object.keys(data).length}`,
-        `Total items: ${Object.values(data).reduce((sum, arr) => sum + (arr?.length || 0), 0)}`
-      ]);
-      return;
-    }
 
-    if (command === "usage") {
-      const totalCommands = Object.values(commandFrequency).reduce((sum, count) => sum + count, 0);
-      const uniqueCommands = Object.keys(commandFrequency).length;
-      const avgPerCommand = totalCommands > 0 ? (totalCommands / uniqueCommands).toFixed(1) : 0;
-      
-      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
-        `=== USAGE ANALYTICS ===`,
-        `Total commands: ${totalCommands}`,
-        `Unique commands: ${uniqueCommands}`,
-        `Average per command: ${avgPerCommand}`,
-        `Command frequency:`,
-        ...Object.entries(commandFrequency)
-          .sort(([,a], [,b]) => b - a)
-          .map(([cmd, count]) => `  ${cmd}: ${count}x (${((count/totalCommands)*100).toFixed(1)}%)`)
-      ]);
-      return;
-    }
+
+
 
     // Grep search command
     if (command.startsWith("grep")) {
@@ -375,19 +356,43 @@ export default function Terminal() {
       if (!searchTerm) {
         setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
           `Usage: grep <search_term>`,
-          `Search through all stored data`
+          `Search through all localStorage data, categories, and aliases`
         ]);
         return;
       }
 
       const results = [];
+      const searchTermLower = searchTerm.toLowerCase();
+      
+      // Search in categories and items
       Object.entries(data).forEach(([category, items]) => {
+        // Search category name
+        if (category.toLowerCase().includes(searchTermLower)) {
+          results.push(`Category: ${category}`);
+        }
+        // Search items in category
         if (Array.isArray(items)) {
           items.forEach((item, index) => {
-            if (item.toLowerCase().includes(searchTerm.toLowerCase())) {
+            if (item.toLowerCase().includes(searchTermLower)) {
               results.push(`${category}[${index + 1}]: ${item}`);
             }
           });
+        }
+      });
+      
+      // Search in aliases
+      const aliases = JSON.parse(localStorage.getItem('terminalAliases') || '{}');
+      Object.entries(aliases).forEach(([aliasName, url]) => {
+        if (aliasName.toLowerCase().includes(searchTermLower) || url.toLowerCase().includes(searchTermLower)) {
+          results.push(`Alias: ${aliasName} -> ${url}`);
+        }
+      });
+      
+      // Search in command history
+      const commandHistory = JSON.parse(localStorage.getItem('terminalHistory') || '[]');
+      commandHistory.forEach((cmd, index) => {
+        if (cmd.toLowerCase().includes(searchTermLower)) {
+          results.push(`History[${index + 1}]: ${cmd}`);
         }
       });
 
@@ -552,6 +557,62 @@ export default function Terminal() {
       }
     }
 
+    // Alias commands (moved before remove to prevent conflicts)
+    if (command.startsWith("alias ")) {
+      const match = command.match(/alias\s+\"(.+?)\"\s+as\s+(\w+)/);
+      if (match) {
+        const [, url, aliasName] = match;
+        
+        // Check if alias already exists
+        if (aliases[aliasName]) {
+          setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Alias "${aliasName}" already exists. Use removealias to remove it first.`]);
+          return;
+        }
+        
+        // Normalize URL
+        const normalizedUrl = url.startsWith('http') ? url : `https://${url}`;
+        setAliases(prev => ({ ...prev, [aliasName]: normalizedUrl }));
+        setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Created alias "${aliasName}" for ${normalizedUrl}`]);
+        return;
+      } else {
+        setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Invalid alias syntax. Use: alias "url" as aliasname`]);
+        return;
+      }
+    }
+
+    if (command === "aliaslist") {
+      const aliasList = Object.keys(aliases);
+      if (aliasList.length === 0) {
+        setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `No aliases found.`]);
+      } else {
+        const aliasEntries = aliasList.map((alias, i) => `${i + 1}. ${alias} -> ${aliases[alias]}`);
+        setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, 
+          `Available aliases (${aliasList.length}):`, 
+          ...aliasEntries
+        ]);
+      }
+      return;
+    }
+
+    if (command.startsWith("removealias ")) {
+      const aliasName = command.substring(12).trim();
+      if (!aliasName) {
+        setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Usage: removealias <aliasname>`]);
+        return;
+      }
+      
+      if (aliases[aliasName]) {
+        const removedUrl = aliases[aliasName];
+        const newAliases = { ...aliases };
+        delete newAliases[aliasName];
+        setAliases(newAliases);
+        setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Removed alias "${aliasName}" (${removedUrl})`]);
+      } else {
+        setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Alias "${aliasName}" not found.`]);
+      }
+      return;
+    }
+
     if (command.startsWith("remove")) {
       // Try to match ID-based removal first: remove 1 from links
       const idMatch = command.match(/remove\s+(\d+)\s+from\s+(\w+)/);
@@ -605,6 +666,15 @@ export default function Terminal() {
         setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Invalid remove syntax. Use: remove "item" from links OR remove 1 from links`]);
         return;
       }
+    }
+
+
+
+    // Check if command is an alias
+    if (aliases[command]) {
+      window.open(aliases[command], "_blank");
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Opening ${aliases[command]} in new tab...`]);
+      return;
     }
 
     setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Unknown command: ${command}. Type 'help' for options.`]);
@@ -740,36 +810,34 @@ export default function Terminal() {
           }}
         >
           <div className="help-panel">
-            <div className="help-section">
-              <div className="section-title">SYSTEM</div>
-              <div className="command-compact">help, clear, logout, debug</div>
-            </div>
-            
-            <div className="help-section">
-              <div className="section-title">DATA MANAGEMENT</div>
-              <div className="command-compact">categories (or) cats</div>
-              <div className="command-compact">addcat "name"</div>
-              <div className="command-compact">removecat "name"</div>
-              <div className="command-compact">add "item" in [category]</div>
-              <div className="command-compact">remove [id] from [category]</div>
-            </div>
-            
-            <div className="help-section">
-              <div className="section-title">QUICK LINKS</div>
-              <div className="command-compact">github, yt, mail, zorotek</div>
-            </div>
-            
-            <div className="help-section">
-              <div className="section-title">ANALYTICS</div>
-              <div className="command-compact">stats, uptime, memory, usage</div>
-            </div>
-            
-            <div className="help-section">
-              <div className="section-title">UTILITIES</div>
-              <div className="command-compact">grep &lt;term&gt;, quote</div>
-            </div>
-            
             <h3>MyCMD Commands</h3>
+            
+            <div className="help-compact">
+              <div className="help-row">
+                <span className="cmd-category">SYSTEM:</span>
+                <span>help • clear • logout • debug</span>
+              </div>
+              
+              <div className="help-row">
+                <span className="cmd-category">DATA:</span>
+                <span>cats • addcat "name" • removecat "name"</span>
+              </div>
+              
+              <div className="help-row">
+                <span className="cmd-category">ITEMS:</span>
+                <span>add "item" in [cat] • remove [id] from [cat]</span>
+              </div>
+              
+              <div className="help-row">
+                <span className="cmd-category">ALIASES:</span>
+                <span>alias "url" as name • aliaslist • removealias</span>
+              </div>
+              
+              <div className="help-row">
+                <span className="cmd-category">TOOLS:</span>
+                <span>grep [term] • stats • uptime • quote</span>
+              </div>
+            </div>
           </div>
         </ElectricBorder>
       )}
