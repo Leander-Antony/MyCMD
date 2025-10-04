@@ -198,8 +198,12 @@ export default function Terminal() {
       setIsAuthenticated(false);
       setShowHelp(false);
       
-      // Clear all session data using service
-      clearAllTerminalData();
+      // Clear only session data, preserve user data (categories and aliases)
+      setStorageCommandCount(0);
+      setStorageCommandFrequency({});
+      setStorageCommandHistory([]);
+      setStorageSessionStart(null);
+      setAuthStatus(false);
       
       // Reset all state
       setCommandCount(0);
