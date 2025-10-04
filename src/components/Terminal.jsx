@@ -20,7 +20,8 @@ import {
   setAliases as setStorageAliases,
   getTerminalData,
   setTerminalData,
-  clearAllTerminalData
+  removeStorageItem,
+  STORAGE_KEYS
 } from '../services/localStorageService.js';
 
 import { 
@@ -202,7 +203,7 @@ export default function Terminal() {
       setStorageCommandCount(0);
       setStorageCommandFrequency({});
       setStorageCommandHistory([]);
-      setStorageSessionStart(null);
+      removeStorageItem(STORAGE_KEYS.SESSION_START);
       setAuthStatus(false);
       
       // Reset all state
