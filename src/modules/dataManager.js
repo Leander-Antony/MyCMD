@@ -42,7 +42,7 @@ export function handleDataCommands(command, data, setData, setHistory) {
       }
       return true;
     } else {
-      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Invalid syntax. Use: addcat "category" or addcat category`]);
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, { text: `Invalid syntax. Use: addcat "category" or addcat category`, className: 'terminal-error' }]);
       return true;
     }
   }
@@ -64,7 +64,7 @@ export function handleDataCommands(command, data, setData, setHistory) {
       }
       return true;
     } else {
-      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Invalid syntax. Use: removecat "category" or removecat category`]);
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, { text: `Invalid syntax. Use: removecat "category" or removecat category`, className: 'terminal-error' }]);
       return true;
     }
   }
@@ -94,7 +94,7 @@ export function handleDataCommands(command, data, setData, setHistory) {
       setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Added "${item}" in ${category} ${itemType}`]);
       return true;
     } else {
-      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Invalid add syntax. Use: add "item" in category`]);
+      setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, { text: `Invalid add syntax. Use: add "item" in category`, className: 'terminal-error' }]);
       return true;
     }
   }
@@ -114,7 +114,7 @@ export function handleDataCommands(command, data, setData, setHistory) {
           setData({ ...data, [category]: updatedCategory });
           setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Removed item #${id}: "${removedItem}" from ${category}`]);
         } else {
-          setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Invalid ID. ${category} has ${data[category].length} items (use 1-${data[category].length})`]);
+          setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, { text: `Invalid ID. ${category} has ${data[category].length} items (use 1-${data[category].length})`, className: 'terminal-error' }]);
         }
       } else {
         setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Category "${category}" not found or is empty`]);
@@ -147,7 +147,7 @@ export function handleDataCommands(command, data, setData, setHistory) {
     }
 
     // Invalid remove syntax
-    setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Invalid remove syntax. Use: remove "item" from category OR remove <number> from category`]);
+    setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, { text: `Invalid remove syntax. Use: remove "item" from category OR remove <number> from category`, className: 'terminal-error' }]);
     return true;
   }
 

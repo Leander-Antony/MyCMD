@@ -196,3 +196,8 @@ input, button, a, .terminal-link {
   z-index: 1;
   white-space: pre;
 }
+
+/* Error message styling for unknown commands and invalid syntax */
+.terminal-error {
+  color: #ff0000 !important;
+}

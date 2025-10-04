@@ -231,7 +231,7 @@ export default function Terminal() {
       return;
     }
 
-    setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Unknown command: ${command}. Type 'help' for options.`]);
+    setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, { text: `Unknown command: ${command}. Type 'help' for options.`, className: 'terminal-error' }]);
   };
 
   const handleKeyDown = (e) => {
@@ -309,6 +309,11 @@ export default function Terminal() {
           {history.map((line, i) => {
             if (React.isValidElement(line)) {
               return React.cloneElement(line, { key: i });
+            }
+            
+            // Handle objects with text and className (for error messages)
+            if (typeof line === 'object' && line.text && line.className) {
+              return <div key={i} className={`terminal-line ${line.className}`}>{line.text}</div>;
             }
             
             // Check if line contains command prompt

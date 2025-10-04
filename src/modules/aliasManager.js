@@ -32,7 +32,7 @@ export const handleAliasCreation = (command, aliases, setAliases, setHistory) =>
     setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Created alias "${aliasName}" for ${normalizedUrl}`]);
     return true;
   } else {
-    setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, `Invalid alias syntax. Use: alias "url" as aliasname`]);
+    setHistory(prev => [...prev, `root@mycmd:~$ ${command}`, { text: `Invalid alias syntax. Use: alias "url" as aliasname`, className: 'terminal-error' }]);
     return true;
   }
 };
