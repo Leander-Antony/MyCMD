@@ -175,13 +175,15 @@ export default function Terminal() {
       return;
     }
 
-    // Handle utility commands (clear, debug, stats, uptime, grep, quote)
+    // Handle utility commands (clear, debug, stats, uptime, grep, quote, export, import)
     const utilityContext = {
       sessionStart,
       commandCount,
       commandFrequency,
       data,
       aliases,
+      setData,
+      setAliases,
       setHistory
     };
     
@@ -400,6 +402,11 @@ export default function Terminal() {
               <div className="help-row">
                 <span className="cmd-category">TOOLS:</span>
                 <span>grep [term] • stats • uptime • quote</span>
+              </div>
+              
+              <div className="help-row">
+                <span className="cmd-category">BACKUP:</span>
+                <span>export • import</span>
               </div>
             </div>
           </div>

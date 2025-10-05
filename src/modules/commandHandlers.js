@@ -234,6 +234,144 @@ export const handleQuoteCommand = (command, setHistory) => {
 };
 
 /**
+ * Handle export command - downloads all user data as JSON
+ * @param {string} command - Command string
+ * @param {Object} data - Categories data
+ * @param {Object} aliases - Aliases data
+ * @param {Function} setHistory - History setter function
+ * @returns {boolean} - Whether command was handled
+ */
+export const handleExportCommand = (command, data, aliases, setHistory) => {
+  if (command !== "export") return false;
+
+  try {
+    // Create export data object
+    const exportData = {
+      version: "1.0",
+      timestamp: new Date().toISOString(),
+      data: {
+        categories: data,
+        aliases: aliases
+      }
+    };
+
+    // Create JSON string
+    const jsonString = JSON.stringify(exportData, null, 2);
+    
+    // Create blob and download
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create temporary download link
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `mycmd-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Clean up the URL
+    URL.revokeObjectURL(url);
+
+    const categoriesCount = Object.keys(data).length;
+    const aliasesCount = Object.keys(aliases).length;
+    
+    setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
+      `✓ Export successful!`,
+      `  ${categoriesCount} categories exported`,
+      `  ${aliasesCount} aliases exported`,
+      `  Downloaded: mycmd-backup-${new Date().toISOString().split('T')[0]}.json`
+    ]);
+    
+  } catch (error) {
+    setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
+      { text: `✗ Export failed: ${error.message}`, className: 'terminal-error' }
+    ]);
+  }
+  
+  return true;
+};
+
+/**
+ * Handle import command - accepts file upload to restore data
+ * @param {string} command - Command string
+ * @param {Object} data - Current categories data
+ * @param {Object} aliases - Current aliases data
+ * @param {Function} setData - Data setter function
+ * @param {Function} setAliases - Aliases setter function
+ * @param {Function} setHistory - History setter function
+ * @returns {boolean} - Whether command was handled
+ */
+export const handleImportCommand = (command, data, aliases, setData, setAliases, setHistory) => {
+  if (command !== "import") return false;
+
+  // Create file input element
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.json';
+  fileInput.style.display = 'none';
+  
+  fileInput.onchange = (event) => {
+    const file = event.target.files[0];
+    if (!file) {
+      setHistory(prev => [...prev, 
+        { text: `✗ No file selected`, className: 'terminal-error' }
+      ]);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importData = JSON.parse(e.target.result);
+        
+        // Validate import data structure
+        if (!importData.data || !importData.data.categories || !importData.data.aliases) {
+          throw new Error('Invalid backup file format');
+        }
+
+        // Merge or replace data based on user preference
+        const newCategories = { ...data, ...importData.data.categories };
+        const newAliases = { ...aliases, ...importData.data.aliases };
+        
+        setData(newCategories);
+        setAliases(newAliases);
+
+        const categoriesCount = Object.keys(importData.data.categories).length;
+        const aliasesCount = Object.keys(importData.data.aliases).length;
+        
+        setHistory(prev => [...prev,
+          `✓ Import successful!`,
+          `  ${categoriesCount} categories imported`,
+          `  ${aliasesCount} aliases imported`,
+          `  Backup from: ${new Date(importData.timestamp).toLocaleString()}`,
+          `  Note: Existing data was merged with imported data`
+        ]);
+        
+      } catch (error) {
+        setHistory(prev => [...prev,
+          { text: `✗ Import failed: ${error.message}`, className: 'terminal-error' },
+          `  Make sure you're uploading a valid MyCMD backup file`
+        ]);
+      }
+    };
+    
+    reader.readAsText(file);
+    document.body.removeChild(fileInput);
+  };
+
+  // Trigger file selection
+  document.body.appendChild(fileInput);
+  fileInput.click();
+  
+  setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
+    `→ Select your MyCMD backup file (.json)...`
+  ]);
+  
+  return true;
+};
+
+/**
  * Handle clear command
  * @param {string} command - Command string
  * @param {Function} setHistory - History setter function
@@ -258,6 +396,8 @@ export const handleUtilityCommands = (command, context) => {
     commandFrequency,
     data,
     aliases,
+    setData,
+    setAliases,
     setHistory
   } = context;
 
@@ -267,7 +407,9 @@ export const handleUtilityCommands = (command, context) => {
     handleStatsCommand(command, sessionStart, commandCount, commandFrequency, setHistory) ||
     handleUptimeCommand(command, sessionStart, setHistory) ||
     handleGrepCommand(command, data, setHistory) ||
-    handleQuoteCommand(command, setHistory)
+    handleQuoteCommand(command, setHistory) ||
+    handleExportCommand(command, data, aliases, setHistory) ||
+    handleImportCommand(command, data, aliases, setData, setAliases, setHistory)
   );
 };
 
@@ -276,5 +418,5 @@ export const handleUtilityCommands = (command, context) => {
  * @returns {Array} - Array of utility command strings
  */
 export const getUtilityCommands = () => {
-  return ["help", "clear", "debug", "stats", "uptime", "grep", "quote"];
+  return ["help", "clear", "debug", "stats", "uptime", "grep", "quote", "export", "import"];
 };
