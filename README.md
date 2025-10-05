@@ -6,11 +6,11 @@ A sleek, terminal-inspired React application with stunning visual effects includ
 
 <div align="center">
   <div style="display: inline-block; width: 45%; margin: 0 2%;">
-    <h4 align="center">GlowDot Effects</h4>
-    <img src="src/assets/screenshot.png" alt="MyCMD with GlowDot Effects" width="100%" />
+    <h4 align="center">Terminal Interface</h4>
+    <img src="src/assets/screenshot.png" alt="MyCMD Terminal Interface" width="100%" />
   </div>
   <div style="display: inline-block; width: 45%; margin: 0 2%;">
-    <h4 align="center">Matrix Effect</h4>
+    <h4 align="center">Matrix Background Effect</h4>
     <img src="src/assets/screenshot2.png" alt="MyCMD with Matrix Effect" width="100%" />
   </div>
 </div>
@@ -18,12 +18,73 @@ A sleek, terminal-inspired React application with stunning visual effects includ
 ## 🚀 Features
 
 - **Interactive Terminal Interface**: Command-line style interface with authentication system
+- **Data Management**: Organize and manage categories, items, and aliases with localStorage persistence
+- **Alias System**: Create shortcuts for frequently used URLs
+- **Export/Import**: Backup and restore your data across different systems
+- **Command History**: Navigate through previous commands with arrow keys
 - **Matrix Rain Effect**: Cascading digital rain animation in the background
 - **Electric Border Animation**: Dynamic glowing border effects
-- **Data Management**: Store and manage links, projects, and courses with localStorage persistence
-- **Command History**: Navigate through previous commands with arrow keys
+- **Auto-complete**: Smart command suggestions and tab completion
+- **Error Handling**: Clear visual feedback for invalid commands and syntax
 - **Responsive Design**: Works seamlessly across different screen sizes
 - **Cyberpunk Aesthetics**: Dark theme with neon accents and futuristic styling
+
+## 🎮 Usage & Commands
+
+### Authentication
+Enter the secret password to access the terminal (default: check the source code).
+
+### Data Management Commands
+
+#### Categories
+- `categories` or `cats` - List all categories and item counts
+- `addcat "category"` - Create a new category
+- `removecat "category"` - Remove an empty category
+- `[category-name]` - Display all items in a category
+
+#### Items
+- `add "item" in category` - Add an item to a category (auto-detects URLs)
+- `remove "item" from category` - Remove item by name
+- `remove [number] from category` - Remove item by ID number
+
+#### Aliases (URL Shortcuts)
+- `alias "url" as name` - Create a shortcut for a URL
+- `aliaslist` - Show all saved aliases
+- `removealias name` - Remove an alias
+- `[alias-name]` - Open the aliased URL in a new tab
+
+#### Backup & Restore
+- `export` - Download all your data as a JSON backup file
+- `import` - Upload and restore data from a JSON backup file
+
+### System Commands
+- `help` - Display help panel with all commands
+- `clear` - Clear the terminal screen
+- `logout` - Log out (preserves your data)
+- `debug` - Show system information
+- `stats` - Display session statistics
+- `uptime` - Show session duration
+- `grep [term]` - Search through your data
+- `quote` - Get a random inspirational quote
+
+### Example Workflow
+```bash
+# Create categories and add items
+root@mycmd:~$ addcat "projects"
+root@mycmd:~$ add "https://github.com/user/repo" in projects
+root@mycmd:~$ add "My awesome project idea" in projects
+
+# Create shortcuts
+root@mycmd:~$ alias "https://github.com" as gh
+root@mycmd:~$ gh  # Opens GitHub in new tab
+
+# Backup your data
+root@mycmd:~$ export  # Downloads backup file
+
+# View your data
+root@mycmd:~$ cats
+root@mycmd:~$ projects
+```
 
 ## 🛠️ Technologies Used
 
@@ -55,50 +116,36 @@ A sleek, terminal-inspired React application with stunning visual effects includ
 4. **Open your browser**
    Navigate to `http://localhost:5173` to see the application
 
-## 🎮 Available Commands
-
-Once the application is running, you can use various terminal commands:
-
-- `help` - Display available commands
-- `clear` - Clear the terminal screen
-- `links` - Manage your saved links
-- `projects` - Manage your projects
-- `courses` - Manage your courses
-- And many more interactive commands!
-
-## 🎨 Changing Background Effects
-
-To switch between different background effects, you need to modify the `src/components/Terminal.jsx` file:
-
-### Switch to Matrix Effect:
-1. Open `src/components/Terminal.jsx`
-2. Find lines around 387-388:
-   ```jsx
-   <GlowDot />
-   {/* <MatrixRain /> */}
-   ```
-3. Comment out `GlowDot` and uncomment `MatrixRain`:
-   ```jsx
-   {/* <GlowDot /> */}
-   <MatrixRain />
-   ```
-
-### Switch to Glow Dot Effects:
-1. Open `src/components/Terminal.jsx`
-2. Find the same lines and reverse the changes:
-   ```jsx
-   <GlowDot />
-   {/* <MatrixRain /> */}
-   ```
-
-The changes will be reflected immediately in your development server thanks to Vite's hot module replacement.
-
 ## 📝 Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
+
+## 🎨 Customization
+
+### Changing Background Effects
+To switch between different background effects, modify `src/components/Terminal.jsx`:
+
+**Switch to Matrix Effect:**
+```jsx
+{/* <GlowDot /> */}
+<MatrixRain />
+```
+
+**Switch to Glow Dot Effects:**
+```jsx
+<GlowDot />
+{/* <MatrixRain /> */}
+```
+
+### Data Persistence
+The application uses localStorage to persist:
+- Categories and items
+- Aliases and shortcuts
+- User preferences
+- Session data (command history, statistics)
 
 ## 🎨 Components
 
@@ -107,21 +154,26 @@ The changes will be reflected immediately in your development server thanks to V
 - **ElectricBorder.jsx** - Glowing border animation component
 - **GlowDot.jsx** - Additional visual effects and animations
 
-## 💾 Data Persistence
+## � File Structure
 
-The application uses localStorage to persist your data including:
-- Saved links and bookmarks
-- Project information
-- Course data
-- User preferences
+```
+src/
+├── components/          # React components
+│   ├── Terminal.jsx    # Main terminal interface
+│   ├── MatrixRain.jsx  # Matrix background effect
+│   ├── ElectricBorder.jsx  # Border animations
+│   └── GlowDot.jsx     # Dot effects
+├── modules/            # Command handlers
+│   ├── commandHandlers.js  # Utility commands
+│   ├── dataManager.js     # Data management
+│   └── aliasManager.js    # Alias system
+├── services/           # Data services
+│   └── localStorageService.js  # localStorage wrapper
+├── utils/              # Utility functions
+│   └── terminalUtils.js   # Terminal helpers
+└── assets/            # Static assets
+```
 
-## 🔧 Configuration
-
-The project includes:
-- **ESLint configuration** with React-specific rules
-- **Vite configuration** optimized for React
-- **Tailwind CSS** for utility-first styling
-- **PostCSS** for advanced CSS processing
 
 
 ## 👨‍💻 Author
