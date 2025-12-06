@@ -401,7 +401,7 @@ export default function Terminal() {
               
               <div className="help-row">
                 <span className="cmd-category">TOOLS:</span>
-                <span>grep [term] • stats • uptime • quote</span>
+                <span>grep [term] • gsearch "q" • stats • uptime • quote</span>
               </div>
               
               <div className="help-row">

@@ -409,7 +409,8 @@ export const handleUtilityCommands = (command, context) => {
     handleGrepCommand(command, data, setHistory) ||
     handleQuoteCommand(command, setHistory) ||
     handleExportCommand(command, data, aliases, setHistory) ||
-    handleImportCommand(command, data, aliases, setData, setAliases, setHistory)
+    handleImportCommand(command, data, aliases, setData, setAliases, setHistory) ||
+    handleGSearchCommand(command, setHistory)
   );
 };
 
@@ -418,5 +419,34 @@ export const handleUtilityCommands = (command, context) => {
  * @returns {Array} - Array of utility command strings
  */
 export const getUtilityCommands = () => {
-  return ["help", "clear", "debug", "stats", "uptime", "grep", "quote", "export", "import"];
+  return ["help", "clear", "debug", "stats", "uptime", "grep", "quote", "export", "import", "gsearch"];
+};
+
+/**
+ * Handle Google search command
+ * @param {string} command - Command string (e.g., gsearch kittens)
+ * @param {Function} setHistory - History setter function
+ * @returns {boolean} - Whether command was handled
+ */
+export const handleGSearchCommand = (command, setHistory) => {
+  if (!command.startsWith("gsearch")) return false;
+
+  const match = command.match(/gsearch\s+"(.+?)"|gsearch\s+(.+)/);
+  const query = match ? (match[1] || match[2]) : null;
+
+  if (!query) {
+    setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
+      { text: `Invalid syntax. Use: gsearch "search terms"`, className: 'terminal-error' }
+    ]);
+    return true;
+  }
+
+  const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+  window.open(url, "_blank");
+
+  setHistory(prev => [...prev, `root@mycmd:~$ ${command}`,
+    `Opening Google search in new tab...`,
+    url
+  ]);
+  return true;
 };

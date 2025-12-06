@@ -69,6 +69,7 @@ Enter the secret password to access the terminal (default: check the source code
 - `stats` - Display session statistics
 - `uptime` - Show session duration
 - `grep [term]` - Search through your data
+- `gsearch "term"` - Open Google search in new tab
 - `quote` - Get a random inspirational quote
 
 ### Example Workflow
@@ -84,6 +85,9 @@ root@mycmd:~$ gh  # Opens GitHub in new tab
 
 # Backup your data
 root@mycmd:~$ export  # Downloads backup file
+
+# Quick web search
+root@mycmd:~$ gsearch "kittens"
 
 # View your data
 root@mycmd:~$ cats
